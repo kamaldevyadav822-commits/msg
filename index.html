@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Decryptor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<style>
+:root {
+  --bg: #020617;
+  --card: #0f172a;
+  --border: #334155;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --text: #e2e8f0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.header {
+  padding: 16px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* INPUT */
+textarea {
+  width: 100%;
+  min-height: 140px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  color: white;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: var(--accent);
+}
+
+/* OUTPUT */
+.output {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 100px;
+  font-size: 15px;
+  word-break: break-word;
+  transition: 0.2s;
+}
+
+/* BUTTON BAR */
+.actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* COPY */
+.copy {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.copy:hover {
+  background: #1e293b;
+}
+
+/* CLEAR */
+.clear {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+.clear:hover {
+  background: #ef444422;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🔓 Decrypt Message</div>
+
+<div class="main">
+  <textarea id="encrypted" placeholder="Paste encrypted text..."></textarea>
+
+  <div class="output" id="result">
+    Decrypted message will appear here...
+  </div>
+</div>
+
+<div class="actions">
+  <button class="copy" onclick="copyText()">Copy</button>
+  <button class="clear" onclick="clearAll()">Clear</button>
+</div>
+
+<script>
+const SECRET = atob("c2VjcmV0X2xvdmVfMjAyNg==");
+
+let timer;
+
+document.getElementById("encrypted").addEventListener("input", function () {
+  clearTimeout(timer);
+  timer = setTimeout(autoDecrypt, 400);
+});
+
+function autoDecrypt() {
+  let encrypted = document.getElementById("encrypted").value.trim();
+
+  if (!encrypted) {
+    document.getElementById("result").innerText = "Decrypted message will appear here...";
+    return;
+  }
+
+  try {
+    let bytes = CryptoJS.AES.decrypt(encrypted, SECRET);
+    let original = bytes.toString(CryptoJS.enc.Utf8);
+
+    if (!original) throw "error";
+
+    document.getElementById("result").innerText = original;
+
+  } catch {
+    document.getElementById("result").innerText = "❌ Invalid or corrupted message";
+  }
+}
+
+function copyText() {
+  let text = document.getElementById("result").innerText;
+  navigator.clipboard.writeText(text);
+}
+
+function clearAll() {
+  document.getElementById("encrypted").value = "";
+  document.getElementById("result").innerText = "Decrypted message will appear here...";
+}
+</script>
+
+</body>
+</html>
