@@ -2,186 +2,351 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Decryptor</title>
+<title>Private Messenger</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 <style>
 :root {
-  --bg: #020617;
-  --card: #0f172a;
-  --border: #334155;
-  --accent: #3b82f6;
-  --accent-hover: #2563eb;
-  --text: #e2e8f0;
+  --bg:#020617;
+  --card:#0f172a;
+  --border:#334155;
+  --text:#e2e8f0;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* AUTH */
+#authScreen{
+  position:fixed;
+  inset:0;
+  background:#020617;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
+
+.auth-box{
+  width:90%;
+  max-width:340px;
+  background:#0f172a;
+  padding:25px;
+  border-radius:16px;
+  border:1px solid #334155;
+  text-align:center;
+}
+
+.auth-box input{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #334155;
+  background:#020617;
+  color:white;
+}
+
+.auth-box button{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.login-btn{background:#3b82f6;color:white;}
+.google-btn{background:#ef4444;color:white;}
 
 /* HEADER */
-.header {
-  padding: 16px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-  border-bottom: 1px solid var(--border);
+.header{
+  padding:16px;
+  text-align:center;
+  border-bottom:1px solid var(--border);
+}
+
+/* TABS */
+.tabs{
+  display:flex;
+  border-bottom:1px solid var(--border);
+}
+
+.tab{
+  flex:1;
+  text-align:center;
+  padding:12px;
+  cursor:pointer;
+}
+
+.tab.active{
+  background:var(--card);
+  border-bottom:2px solid #3b82f6;
 }
 
 /* MAIN */
-.main {
-  flex: 1;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.main{
+  flex:1;
+  padding:16px;
+  padding-bottom:100px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
-/* INPUT */
-textarea {
-  width: 100%;
-  min-height: 140px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  color: white;
-  font-size: 14px;
-  resize: none;
-  outline: none;
-}
-
-textarea:focus {
-  border-color: var(--accent);
+textarea{
+  width:100%;
+  min-height:140px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  color:white;
 }
 
 /* OUTPUT */
-.output {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px;
-  min-height: 100px;
-  font-size: 15px;
-  word-break: break-word;
-  transition: 0.2s;
+.output{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  min-height:100px;
 }
 
-/* BUTTON BAR */
-.actions {
-  position: sticky;
-  bottom: 0;
-  background: var(--bg);
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 10px;
+/* FLOAT BAR (FIXED PROPERLY) */
+.floating{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:10px;
+
+  margin:auto;
+  width:95%;
+  max-width:420px;
+
+  display:flex;
+  gap:10px;
+  padding:10px;
+
+  border-radius:16px;
+  background:#020617ee;
+  border:1px solid var(--border);
+
+  backdrop-filter: blur(10px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.4);
+
+  transition:bottom 0.25s ease;
 }
 
-button {
-  flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
+/* BUTTONS */
+button{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-weight:600;
 }
 
-/* COPY */
-.copy {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
+.encrypt-btn{background:#22c55e;}
+.copy-btn{background:#1e293b;}
+.clear-btn{background:transparent;border:1px solid #ef4444;color:#ef4444;}
+
+.clear-decrypt{
+  margin-top:10px;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ef4444;
+  color:#ef4444;
+  background:transparent;
+  width:100%;
 }
 
-.copy:hover {
-  background: #1e293b;
-}
-
-/* CLEAR */
-.clear {
-  background: transparent;
-  border: 1px solid #ef4444;
-  color: #ef4444;
-}
-
-.clear:hover {
-  background: #ef444422;
-}
+.hidden{display:none;}
 </style>
 </head>
 
 <body>
 
-<div class="header">🔓 Decrypt Message</div>
-
-<div class="main">
-  <textarea id="encrypted" placeholder="Paste encrypted text..."></textarea>
-
-  <div class="output" id="result">
-    Decrypted message will appear here...
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-box">
+    <h2>🔐 Login</h2>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button class="login-btn" onclick="login()">Login</button>
+    <button class="google-btn" onclick="googleLogin()">Google Sign In</button>
+    <p id="authError" style="color:red;"></p>
   </div>
 </div>
 
-<div class="actions">
-  <button class="copy" onclick="copyText()">Copy</button>
-  <button class="clear" onclick="clearAll()">Clear</button>
+<div class="header">🔐 Private Messenger</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('encrypt', this)">Encrypt</div>
+  <div class="tab" onclick="switchTab('decrypt', this)">Decrypt</div>
 </div>
 
-<script>
-const SECRET = atob("c2VjcmV0X2xvdmVfMjAyNg==");
+<!-- ENCRYPT -->
+<div id="encryptTab" class="main">
+  <textarea id="msg" placeholder="Type message..."></textarea>
+  <div class="output" id="encResult">Encrypted ID will appear here...</div>
+</div>
 
-let timer;
+<!-- DECRYPT -->
+<div id="decryptTab" class="main hidden">
+  <textarea id="encrypted" placeholder="Paste secret ID..."></textarea>
+  <div class="output" id="decResult">Message will appear here...</div>
+  <button class="clear-decrypt" onclick="clearDec()">Clear</button>
+</div>
 
-document.getElementById("encrypted").addEventListener("input", function () {
-  clearTimeout(timer);
-  timer = setTimeout(autoDecrypt, 400);
+<!-- FLOAT -->
+<div id="floatBar" class="floating hidden">
+  <button class="encrypt-btn" onclick="encrypt()">Encrypt</button>
+  <button class="copy-btn" onclick="copyEnc()">Copy</button>
+  <button class="clear-btn" onclick="clearEnc()">Clear</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAjUxfiAAok1mUWOfAEhsp_d2_Z3ATLmd0",
+  authDomain: "scrt-8fca4.firebaseapp.com",
+  projectId: "scrt-8fca4",
+  storageBucket: "scrt-8fca4.firebasestorage.app",
+  messagingSenderId: "141440441971",
+  appId: "1:141440441971:web:9660ae1ce99e284f46d406"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+/* AUTH */
+window.login = async () => {
+  try{
+    await signInWithEmailAndPassword(auth,email.value,password.value);
+  }catch{
+    authError.innerText="❌ Login failed";
+  }
+};
+
+window.googleLogin = async () => {
+  try{
+    await signInWithPopup(auth,provider);
+  }catch{
+    authError.innerText="❌ Google login failed";
+  }
+};
+
+onAuthStateChanged(auth,user=>{
+  if(user) authScreen.style.display="none";
 });
 
-function autoDecrypt() {
-  let encrypted = document.getElementById("encrypted").value.trim();
+/* KEY */
+const SECRET = atob(["c2Vj","cmV0X2xv","dmVfMjAyNg=="].join(""));
 
-  if (!encrypted) {
-    document.getElementById("result").innerText = "Decrypted message will appear here...";
+/* UI */
+let currentTab="encrypt";
+const bar=document.getElementById("floatBar");
+
+window.switchTab=(tab,el)=>{
+  currentTab=tab;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+
+  encryptTab.classList.toggle("hidden",tab!=="encrypt");
+  decryptTab.classList.toggle("hidden",tab!=="decrypt");
+  bar.classList.toggle("hidden",tab!=="encrypt");
+};
+
+msg.addEventListener("focus",()=>bar.classList.remove("hidden"));
+
+/* KEYBOARD FIX */
+window.addEventListener("resize", () => {
+  if(window.innerHeight < 500){
+    bar.style.bottom="80px";
+  } else {
+    bar.style.bottom="10px";
+  }
+});
+
+/* ENCRYPT */
+window.encrypt=async ()=>{
+  let m=msg.value.trim();
+  if(!m) return;
+
+  let enc=CryptoJS.AES.encrypt(m,SECRET).toString();
+  let id=Math.random().toString(36).substring(2,8);
+
+  await setDoc(doc(db,"messages",id),{
+    data:enc,
+    expiresAt:Date.now()+300000
+  });
+
+  encResult.innerText=id;
+};
+
+window.copyEnc=()=>navigator.clipboard.writeText(encResult.innerText);
+
+window.clearEnc=()=>{
+  msg.value="";
+  encResult.innerText="Encrypted ID will appear here...";
+};
+
+/* DECRYPT */
+let timer;
+encrypted.addEventListener("input",()=>{
+  clearTimeout(timer);
+  timer=setTimeout(fetchDecrypt,400);
+});
+
+async function fetchDecrypt(){
+  let id=encrypted.value.trim();
+  if(!id) return;
+
+  let ref=doc(db,"messages",id);
+  let snap=await getDoc(ref);
+
+  if(!snap.exists()){
+    decResult.innerText="❌ Not found";
     return;
   }
 
-  try {
-    let bytes = CryptoJS.AES.decrypt(encrypted, SECRET);
-    let original = bytes.toString(CryptoJS.enc.Utf8);
+  let data=snap.data();
 
-    if (!original) throw "error";
-
-    document.getElementById("result").innerText = original;
-
-  } catch {
-    document.getElementById("result").innerText = "❌ Invalid or corrupted message";
+  if(Date.now()>data.expiresAt){
+    decResult.innerText="⏳ Expired";
+    await deleteDoc(ref);
+    return;
   }
+
+  let bytes=CryptoJS.AES.decrypt(data.data,SECRET);
+  decResult.innerText=bytes.toString(CryptoJS.enc.Utf8);
+
+  await deleteDoc(ref);
+
+  setTimeout(()=>{
+    decResult.innerText="⏳ Hidden";
+  },10000);
 }
 
-function copyText() {
-  let text = document.getElementById("result").innerText;
-  navigator.clipboard.writeText(text);
-}
-
-function clearAll() {
-  document.getElementById("encrypted").value = "";
-  document.getElementById("result").innerText = "Decrypted message will appear here...";
-}
+window.clearDec=()=>{
+  encrypted.value="";
+  decResult.innerText="🧹 Cleared";
+};
 </script>
 
 </body>
